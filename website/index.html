@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="nl">
+ 
+<head>
+    <meta charset="UTF-8">
+    <title>Kleine vragen in de literatuur</title>
+    <style>
+    body, html {
+  height: 100%;
+}
+
+.tabcontent {
+    width: 800px; 
+    margin: auto; 
+    padding-top: 2cm; 
+    padding-bottom: 2cm; 
+    text-align: center; 
+    background: rgba(255,255,255,0.85);
+}
+
+.textcontent {
+    width: 700px;
+    margin: auto;
+}
+
+.bg { 
+  /* The image used */
+  background-image: url("magazijn.jpg");
+
+  /* Full height */
+  height: 100%; 
+
+  /* Center and scale the image nicely */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.footer {
+   position: fixed;
+   left: 0;
+   bottom: 0;
+   width: 100%;
+   background-color: black;
+   color: white;
+   text-align: center;
+}
+
+h1 { font-family: Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif; font-size: 24px; font-style: normal; font-variant: normal; font-weight: 700; line-height: 26.4px; } h3 { font-family: Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif; font-size: 14px; font-style: normal; font-variant: normal; font-weight: 700; line-height: 15.4px; } p { font-family: Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif; font-size: 14px; font-style: normal; font-variant: normal; font-weight: 400; line-height: 20px; } blockquote { font-family: Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif; font-size: 21px; font-style: normal; font-variant: normal; font-weight: 400; line-height: 30px; } pre { font-family: Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif; font-size: 13px; font-style: normal; font-variant: normal; font-weight: 400; line-height: 18.5714px; }
+
+/* Tooltip functionality*/
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 300px;
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -60px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.tooltip .tooltiptext::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #555 transparent transparent transparent;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+}
+
+.tooltip a:link {
+  text-decoration: none;
+  color:black;
+}
+
+.tooltip a:visited {
+  text-decoration: none;
+  color: black;
+}
+
+.tooltip a:hover {
+  text-decoration: underline;
+  color: #C24E27;
+}
+
+.tooltip a:active {
+  text-decoration: underline;
+}
+    </style>
+    
+    
+<script type="text/javascript" src="./jquery-3.7.1.min.js"> </script>
+<script>
+// Function from: https://stackoverflow.com/a/2450976
+function shuffle(array) {
+  let currentIndex = array.length,  randomIndex;
+
+  // While there remain elements to shuffle.
+  while (currentIndex > 0) {
+
+    // Pick a remaining element.
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+
+    // And swap it with the current element.
+    [array[currentIndex], array[randomIndex]] = [
+      array[randomIndex], array[currentIndex]];
+  }
+
+  return array;
+}
+
+// Bron:
+// https://codeeverywhere.ca/post.php?id=2&title=adding-console.log-timestamp-in-javascript
+(function() {
+    var old = console.log;
+    console.log("> Log Date Format DD/MM/YY HH:MM:SS - UTCString");
+    console.log = function() {
+        var n = new Date();
+        var d = ("0" + (n.getDate().toString())).slice(-2),
+            m = ("0" + ((n.getMonth() + 1).toString())).slice(-2),
+            y = ("0" + (n.getFullYear().toString())).slice(-2),
+            t = n.toUTCString().slice(-13, -4);
+        Array.prototype.unshift.call(arguments, "[" + d + "/" + m + "/" + y + t + "]");
+        old.apply(this, arguments);
+    }
+})();
+
+// Globals
+
+// Not defined until JSON is loaded:
+var questions = null;
+var indices = null;
+var shuffled = null;
+var randomSelection = null;
+var maxInt = null;
+
+// Defined from the start
+const numLines = 8;
+var index = numLines;
+// var dbnl_metadata = $.getJSON("./dbnl_index_minified.json")
+// var data = $.getJSON("./less_than_20_minified.json", function(){initialise()});
+var site_data = $.getJSON("./site_data.json", function(){initialise()});
+
+function initialise(){
+    questions = Object.keys(site_data.responseJSON['vragen'])
+    questions.sort()
+    indices = Array.from(Array(questions.length).keys());
+    maxInt = questions.length - 1
+    
+    // Get 8 random indices from the full array.
+    shuffled = shuffle(indices);
+    randomSelection = shuffled.slice(0,index);
+
+    var table = document.getElementById("poem")
+    for (i = 0; i < randomSelection.length; i++) {
+        const row = table.insertRow();
+        const cell = row.insertCell();
+        cell.classList.add("tooltip");
+        const poetry_text = questions[randomSelection[i]];
+        const possible_books = site_data.responseJSON['vragen'][poetry_text];
+        const selected_book = possible_books[getRandomInt(possible_books.length)];
+        row.appendChild(cell);
+        const metadata = getHover(selected_book);
+        const hover_text = metadata[0];
+        const url = metadata[1];
+        cell.innerHTML = `<a href="${url}">${poetry_text}</a><span class="tooltiptext">${hover_text}</span>`
+    } 
+}
+
+function getHover(identifier){
+	var book_metadata = site_data.responseJSON['metadata'][identifier]
+	var url = "https://www.dbnl.org/tekst/" + identifier
+	var author = book_metadata['auteur']
+	var title = book_metadata['title']
+	var year = book_metadata['year']
+	var edition = book_metadata['edition']
+	var hover_text = `Uit: ${title} (${year}, ${edition}). Geschreven door ${author}.`
+	console.log(hover_text)
+	return [hover_text, url]
+}	
+
+
+function getNext(){
+    index++;
+    index = index % questions.length; // to prevent overflow.
+    return questions[shuffled[index]];
+}
+
+
+function getRandomInt(maxNum) {
+  return Math.floor(Math.random() * maxNum);
+}
+
+
+function update() {
+    var randIndex = getRandomInt(numLines);
+    var old_poetry_text = randomSelection[randIndex];
+    var new_poetry_text = getNext();
+    randomSelection[randIndex] = new_poetry_text;
+    const possible_books = site_data.responseJSON['vragen'][new_poetry_text];
+    const selected_book = possible_books[getRandomInt(possible_books.length)];
+    const metadata = getHover(selected_book);
+    const hover_text = metadata[0];
+    const url = metadata[1];
+    const new_html = `<a href="${url}">${new_poetry_text}</a><span class="tooltiptext">${hover_text}</span>`
+    // var table_cells = $('table[id="poem"]').children("tr").children("td")
+    $('td.tooltip').eq(randIndex).animate({'opacity': 0}, 1500, function(){
+        $(this).html(new_html).animate({'opacity': 1}, 1500);    
+    });
+}
+
+
+var interval = setInterval(update, 5000);
+var interval_on = true;
+
+function toggle_interval(){
+    if (interval_on){
+        clearInterval(interval);
+        interval_on = false;
+        document.querySelector('#intervalButton').textContent = 'Blijf verversen';
+    }
+    else {
+        interval = setInterval(update, 5000);
+        interval_on = true;
+        document.querySelector('#intervalButton').textContent = 'Pauze';
+    }
+}
+
+function openTab(tabName) {
+    tabcontent = document.getElementsByClassName("tabcontent");
+    for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+    }
+    document.getElementById(tabName).style.display = "block";
+}
+</script>
+</head>
+ 
+<body>
+<div class="bg">
+<div class="tabcontent" id="Poetry">
+<h1>Verwarring en verwondering</h1>
+ <table id="poem" class="poem" style="margin: auto;">
+ 
+</table>
+<button id="intervalButton" onclick="toggle_interval()" style="margin-top:50px;">Pauze</button>
+<button id="info" onclick="openTab('Info')" style="margin-top:50px;">Over</button>
+</div>
+<div class="tabcontent" id="Info" style="display: none;">
+<div class="textcontent">
+<h1>Over het gedicht</h1>
+<p>Wanneer we het over literatuur hebben, gaat het vaak over de Grote Vragen des levens die door gerenommeerde auteurs behandeld worden. Met dit digitale gedicht wilde ik me eens richten op de kleine vragen; alle vragen die tussendoor langskomen als je een boek leest. Om Grote Vragen tastbaar te maken, moet je erg veel kleinere vragen stellen. Deze vragen zijn veel concreter --soms zelfs alledaags. Maar als je ze allemaal achter elkaar zet, dan worden ze weer net zo ongrijpbaar als die Grote Vragen waar we mee begonnen. Het resultaat is een desoriënterend geheel.</p>
+
+<b>Samenstelling</b>
+<p>Het gedicht op deze pagina is samengesteld uit de vragen die worden gesteld in de proza die online verkrijgbaar is via DBNL: de Digitale Bibliotheek voor de Nederlandse Letteren. Om dit gedicht te maken heb ik eerst alle prozateksten gedownload van DBNL. Alle (automatisch gedetecteerde) zinnen die eindigen met een vraagteken, en die twintig of minder woorden bevatten, zijn opgenomen in een overzichtsbestand. Het gedicht bestaat uit acht willekeurige vragen die automatisch ververst worden, in willekeurige volgorde. Door de grote hoeveelheid vragen zie je vrijwel nooit dezelfde tekst.</p>
+
+<button id="info" onclick="openTab('Poetry')" style="margin-top:50px;">Terug naar gedicht</button>
+</div>
+</div>
+
+<div class="footer">
+<p>Willekeurig gedicht door Emiel van Miltenburg. Bronteksten uit DBNL (publiek domein). Achtergrondfoto van de Koninklijke Bibliotheek (KB, Den Haag; publiek domein).</p>
+</div>
+</div>
+
+
+</body>
+ 
+</html>

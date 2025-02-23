@@ -7,6 +7,9 @@ This script downloads:
 - and that are available in epub format.
 """
 
+import ssl
+ssl._create_default_https_context = ssl._create_unverified_context
+
 from utils import load_dbnl_data, select_entries, download_entry
 import time
 

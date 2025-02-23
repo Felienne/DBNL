@@ -1,3 +1,6 @@
+#skip ebooks
+preparation/proza
+
 # General
 .DS_Store
 .AppleDouble

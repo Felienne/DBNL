@@ -54,7 +54,8 @@ def extend_metadata(content, metadata):
         metadata.append(entry)
 
 metadata = []
-for page in range(1,59):
+for page in range(1, 88):
+    # er zijn  nu 89 pagina's maar dit zou eigenlijk met een try moeten!
     url = f'https://www.dbnl.org/titels/titels_ebook.php?s=t&p={page}'
     print(url)                              # show current page.
     content = requests.get(url).content     # download content.

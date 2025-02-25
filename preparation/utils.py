@@ -69,7 +69,10 @@ def download(url, folder):
     if not os.path.exists(folder):
         os.makedirs(folder)
     filename = url.split('/')[-1]
-    urllib.request.urlretrieve(url, folder + filename)
+    if not os.path.exists(folder+filename):
+        urllib.request.urlretrieve(url, folder + filename)
+    else:
+        print(f'{url} already downloaded')
 
 
 def download_entry(entry, folder):

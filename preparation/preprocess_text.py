@@ -9,8 +9,8 @@ nlp.add_pipe('sentencizer')
 nlp.max_length = 6_000_000
 
 
-def select_sentences(paths):
-    "Select sentences from files located in PATHS with a specific number of syllables."
+def select_sentences(paths, searchterm):
+    "Select sentences from files located in PATHS that include search word."
     sent_index = dict()
     for path in paths:
         print(path)
@@ -19,13 +19,13 @@ def select_sentences(paths):
         doc = nlp(text)
         relevant_sentences = []
         for sentence in doc.sents:
-            if sentence.text.endswith("?"):
+            if searchterm in sentence.text:
                 relevant_sentences.append(sentence.text)
         sent_index[base_name] = relevant_sentences
     return sent_index
 
 
 paths = glob.glob('./proza/*.epub')
-sent_index = select_sentences(paths)
+sent_index = select_sentences(paths, 'vrouw')
 with open('resources/selected_sentences.json','w') as f:
     json.dump(sent_index, f, indent=4)

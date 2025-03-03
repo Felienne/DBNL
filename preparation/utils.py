@@ -86,7 +86,7 @@ def get_text(filename):
     "Get text from an epub file."
     try:
         book = epub.read_epub(filename)
-    except (AttributeError, XMLSyntaxError):
+    except:
         warnings.warn(f"File seems to be corrupt: {filename}. Returning empty string.", RuntimeWarning)
         return ''
     texts = []
